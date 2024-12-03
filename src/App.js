@@ -34,7 +34,8 @@ class App extends Component {
 				"Gender",
 				"Exam_Score",
 			],
-			selected_x: "Gender",
+			selected_x_1: "Gender",
+			selected_x_2: "Extracurricular_Activities",
 		};
 	}
 
@@ -42,9 +43,17 @@ class App extends Component {
 		this.setState({ data: csv_data });
 	};
 
-	handleDropdownChange = (event) => {
-		this.setState({ selected_x: event.target.value });
+	handleDropdownChangeOne = (event) => {
+		this.setState({ selected_x_1: event.target.value });
+		console.log(
+			"Changed xscale from ",
+			this.state.selected_x_1,
+			" to ",
+			event.target.value
+		);
 	};
+
+	handleDropdownChangeTwo = (event) => {};
 
 	render() {
 		return (
@@ -53,15 +62,15 @@ class App extends Component {
 				{this.state.columns.length > 0 && (
 					<Dropdown
 						options={this.state.columns}
-						selectedValue={this.state.selected_x}
-						onChange={this.handleDropdownChange}
+						selectedValue={this.state.selected_x_1}
+						onChange={this.handleDropdownChangeOne}
 						label="X Scale"
 					/>
 				)}
 				<ScatterPlotComponent csv_data={this.state.data} />
 				<StackedBarComponent
 					csv_data={this.state.data}
-					x_scale={this.state.selected_x}
+					x_scale={this.state.selected_x_1}
 				/>
 			</div>
 		);
