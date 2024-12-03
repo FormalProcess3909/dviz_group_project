@@ -4,9 +4,7 @@ import * as d3 from "d3";
 class StackedBarComponent extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			set_y: "Total Students",
-		};
+		this.state = {};
 	}
 	componentDidMount() {}
 

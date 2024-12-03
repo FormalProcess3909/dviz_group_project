@@ -10,10 +10,15 @@ class ScatterPlotComponent extends Component {
 	}
 
 	componentDidMount() {
+		console.log("Scatterplot selected x scale: ", this.props.x_scale);
 		this.renderChart();
 	}
 
 	componentDidUpdate() {
+		console.log(
+			"Scatterplot selected x scale updated: ",
+			this.props.x_scale
+		);
 		console.log("Loaded csv_data", this.props.csv_data);
 		this.renderChart();
 	}

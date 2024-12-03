@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import "./css/App.css";
+import "./App.css";
 import {
 	FileUpload,
 	StackedBarComponent,
@@ -45,12 +45,12 @@ class App extends Component {
 
 	handleDropdownChangeOne = (event) => {
 		this.setState({ selected_x_1: event.target.value });
-		console.log(
-			"Changed xscale from ",
-			this.state.selected_x_1,
-			" to ",
-			event.target.value
-		);
+		//	console.log(
+		//		"Changed xscale from ",
+		//		this.state.selected_x_1,
+		//		" to ",
+		//		event.target.value
+		//	);
 	};
 
 	handleDropdownChangeTwo = (event) => {};
@@ -59,18 +59,31 @@ class App extends Component {
 		return (
 			<div>
 				<FileUpload set_data={this.setData} />
-				{this.state.columns.length > 0 && (
-					<Dropdown
-						options={this.state.columns}
-						selectedValue={this.state.selected_x_1}
-						onChange={this.handleDropdownChangeOne}
-						label="X Scale"
-					/>
-				)}
-				<ScatterPlotComponent csv_data={this.state.data} />
-				<StackedBarComponent
+				<div className="container dropdown">
+					{this.state.columns.length > 0 && (
+						<Dropdown
+							options={this.state.columns}
+							selectedValue={"Gender"}
+							onChange={this.handleDropdownChangeOne}
+							label="X Scale"
+						/>
+					)}
+					{this.state.columns.length > 0 && (
+						<Dropdown
+							options={this.state.columns}
+							selectedValue={"Gender"}
+							onChange={this.handleDropdownChangeOne}
+							label="X Scale"
+						/>
+					)}
+				</div>
+				<ScatterPlotComponent
 					csv_data={this.state.data}
 					x_scale={this.state.selected_x_1}
+				/>
+				<StackedBarComponent
+					csv_data={this.state.data}
+					x_scale={this.state.selected_x_2}
 				/>
 			</div>
 		);
