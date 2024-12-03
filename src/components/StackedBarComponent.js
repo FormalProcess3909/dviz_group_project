@@ -1,23 +1,22 @@
-import React, {Component} from "react";
-import * as d3 from d3;
+import React, { Component } from "react";
+import * as d3 from "d3";
 
-class StackedBarComponent extends Component{
+class StackedBarComponent extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			set_y: "Total Students",
+		};
+	}
+	componentDidMount() {}
 
-    componentDidMount(){
+	componentDidUpdate() {}
 
-    }
+	renderChart() {}
 
-    componentDidUpdate(){
-
-    }
-
-    renderChart(){
-
-    }
-
-    render(){
-        
-    }
+	render() {
+		return;
+	}
 }
 
 export default StackedBarComponent;
