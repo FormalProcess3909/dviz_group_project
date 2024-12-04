@@ -70,16 +70,16 @@ class App extends Component {
 				<div className="dropdown">
 					<Dropdown
 						options={this.state.quantitative_col}
-						selectedValue={"Gender"}
+						selectedValue={this.state.selected_x_1}
 						onChange={this.handleDropdownChangeOne}
 						label="X Scale"
 					/>
 
 					<Dropdown
 						options={this.state.binary_col}
-						selectedValue={"Gender"}
+						selectedValue={this.state.selected_color_1}
 						onChange={this.handleColorChangeOne}
-						label="X Scale"
+						label="Color"
 					/>
 				</div>
 				<ScatterPlotComponent
