@@ -42,22 +42,22 @@ class FileUpload extends Component {
 			// Add object to result if it's not an empty row
 			if (Object.keys(obj).length && lines[i].trim()) {
 				const parsedObj = {
-					Hours_Studied: parseInt(obj["Hours_Studied"]),
-					Attendance: parseInt(obj["Attendance"]),
+					Hours_Studied: parseFloat(obj["Hours_Studied"]),
+					Attendance: parseFloat(obj["Attendance"]),
 					Parental_Involvement: obj["Parental_Involvement"],
 					Access_to_Resources: obj["Access_to_Resources"],
 					Extracurricular_Activities:
 						obj["Extracurricular_Activities"],
-					Sleep_Hours: parseInt(obj["Sleep_Hours"]),
-					Previous_Scores: parseInt(obj["Previous_Scores"]),
+					Sleep_Hours: parseFloat(obj["Sleep_Hours"]),
+					Previous_Scores: parseFloat(obj["Previous_Scores"]),
 					Motivation_Level: obj["Motivation_Level"],
 					Internet_Access: obj["Internet_Access"],
-					Tutoring_Sessions: parseInt(obj["Tutoring_Sessions"]),
+					Tutoring_Sessions: parseFloat(obj["Tutoring_Sessions"]),
 					Family_Income: obj["Family_Income"],
 					Teacher_Quality: obj["Teacher_Quality"],
 					School_Type: obj["School_Type"],
 					Peer_Influence: obj["Peer_Influence"],
-					Physical_Activity: parseInt(obj["Physical_Activity"]),
+					Physical_Activity: parseFloat(obj["Physical_Activity"]),
 					Learning_Disabilities: obj["Learning_Disabilities"],
 					Parental_Education_Level: obj["Parental_Education_Level"],
 					Distance_from_Home: obj["Distance_from_Home"],

@@ -12,29 +12,34 @@ class App extends Component {
 		super(props);
 		this.state = {
 			data: [],
-			columns: [
+			quantitative_col: [
 				"Hours_Studied",
 				"Attendance",
+				"Sleep_Hours",
+				"Tutoring_Sessions",
+				"Exam_Score",
+				"Physical_Activity",
+				"Previous_Scores",
+			],
+			binary_col: [
+				"Extracurricular_Activities",
+				"Gender",
+				"Learning_Disabilities",
+				"Internet_Access",
+				"School_Type",
+			],
+			categorical_col: [
 				"Parental_Involvement",
 				"Access_to_Resources",
-				"Extracurricular_Activities",
-				"Sleep_Hours",
-				"Previous_Scores",
 				"Motivation_Level",
-				"Internet_Access",
-				"Tutoring_Sessions",
 				"Family_Income",
 				"Teacher_Quality",
-				"School_Type",
 				"Peer_Influence",
-				"Physical_Activity",
-				"Learning_Disabilities",
 				"Parental_Education_Level",
 				"Distance_from_Home",
-				"Gender",
-				"Exam_Score",
 			],
-			selected_x_1: "Gender",
+			selected_x_1: "Hours_Studied",
+			selected_color_1: "Gender",
 			selected_x_2: "Extracurricular_Activities",
 		};
 	}
@@ -53,33 +58,34 @@ class App extends Component {
 		//	);
 	};
 
+	handleColorChangeOne = (event) => {
+		this.setState({ selected_color_1: event.target.value });
+	};
 	handleDropdownChangeTwo = (event) => {};
 
 	render() {
 		return (
-			<div>
+			<div className="container">
 				<FileUpload set_data={this.setData} />
-				<div className="container dropdown">
-					{this.state.columns.length > 0 && (
-						<Dropdown
-							options={this.state.columns}
-							selectedValue={"Gender"}
-							onChange={this.handleDropdownChangeOne}
-							label="X Scale"
-						/>
-					)}
-					{this.state.columns.length > 0 && (
-						<Dropdown
-							options={this.state.columns}
-							selectedValue={"Gender"}
-							onChange={this.handleDropdownChangeOne}
-							label="X Scale"
-						/>
-					)}
+				<div className="dropdown">
+					<Dropdown
+						options={this.state.quantitative_col}
+						selectedValue={"Gender"}
+						onChange={this.handleDropdownChangeOne}
+						label="X Scale"
+					/>
+
+					<Dropdown
+						options={this.state.binary_col}
+						selectedValue={"Gender"}
+						onChange={this.handleColorChangeOne}
+						label="X Scale"
+					/>
 				</div>
 				<ScatterPlotComponent
 					csv_data={this.state.data}
 					x_scale={this.state.selected_x_1}
+					color={this.state.selected_color_1}
 				/>
 				<StackedBarComponent
 					csv_data={this.state.data}

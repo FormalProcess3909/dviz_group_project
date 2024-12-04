@@ -1,4 +1,4 @@
-.container.dropdown {
+.container .dropdown {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -6,12 +6,12 @@
 	margin: 20px;
 }
 
-.container.dropdown label {
+.container .dropdown label {
 	margin-right: 10px;
 	font-weight: bold;
 }
 
-.container.dropdown select {
+.container .dropdown select {
 	font-size: 16px;
 	padding: 5px;
 	border: 1px solid #ccc;
