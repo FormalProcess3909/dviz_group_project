@@ -4,19 +4,24 @@ import * as d3 from "d3";
 class ScatterPlotComponent extends Component {
 	constructor(props) {
 		super(props);
+		this.state = {
+			x_axis_min: 0,
+			x_axis_max: 0,
+			y_axis_min: 0,
+			y_axis_max: 0,
+		};
 	}
 
+	calculateScaleBounds = (data, scale, margin = 10) => {
+		const [min, max] = d3.extent(data, (d) => +d[scale]);
+		return { min: min - margin, max: max + margin };
+	};
+
 	componentDidMount() {
-		//console.log("Scatterplot selected x scale: ", this.props.x_scale);
 		this.renderChart();
 	}
 
 	componentDidUpdate() {
-		//	console.log(
-		//		"Scatterplot selected x scale updated: ",
-		//		this.props.x_scale
-		//	);
-		//console.log("Loaded csv_data", this.props.csv_data);
 		this.renderChart();
 	}
 
@@ -26,21 +31,23 @@ class ScatterPlotComponent extends Component {
 		const height = 500 - margin.top - margin.bottom;
 
 		const data = this.props.csv_data;
-		const select_x = this.props.x_scale;
+		const x_axis = this.props.x_scale;
+		const y_axis = this.props.y_scale;
 		const color = this.props.color;
 
-		console.log("Rendering CSV data: ", data);
+		const x_bounds = this.calculateScaleBounds(data, x_axis);
+		const y_bounds = this.calculateScaleBounds(data, y_axis);
 
 		d3.select(".chart").selectAll("*").remove();
 
 		const xScale = d3
 			.scaleLinear()
-			.domain(d3.extent(data, (d) => +d[select_x]))
+			.domain([x_bounds.min, x_bounds.max])
 			.range([0, width]);
 
 		const yScale = d3
 			.scaleLinear()
-			.domain(d3.extent(data, (d) => +d["Exam_Score"]))
+			.domain([y_bounds.min, y_bounds.max])
 			.range([height, 0]);
 
 		const svg = d3
@@ -66,8 +73,8 @@ class ScatterPlotComponent extends Component {
 				(enter) =>
 					enter
 						.append("circle")
-						.attr("cx", (d) => xScale(d[select_x]))
-						.attr("cy", (d) => yScale(d["Exam_Score"]))
+						.attr("cx", (d) => xScale(d[x_axis]))
+						.attr("cy", (d) => yScale(d[y_axis]))
 						.attr("r", 5)
 						.attr("fill", (d) => d3.color(d[color])),
 				(update) => update,
