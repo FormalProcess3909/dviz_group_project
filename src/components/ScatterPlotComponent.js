@@ -77,7 +77,7 @@ class ScatterPlotComponent extends Component {
 	render() {
 		return (
 			<div className="parent">
-				<div className="chart"></div>
+				<div className="chart" />
 			</div>
 		);
 	}
