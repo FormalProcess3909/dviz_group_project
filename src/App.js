@@ -38,9 +38,9 @@ class App extends Component {
 				"Parental_Education_Level",
 				"Distance_from_Home",
 			],
-			selected_x_1: "Hours_Studied",
-			selected_color_1: "Gender",
-			selected_x_2: "Extracurricular_Activities",
+			chart1_x_axis: "Hours_Studied",
+			chart1_color_select: "Gender",
+			chart2_x_axis: "Extracurricular_Activities",
 		};
 	}
 
@@ -48,8 +48,8 @@ class App extends Component {
 		this.setState({ data: csv_data });
 	};
 
-	handleDropdownChangeOne = (event) => {
-		this.setState({ selected_x_1: event.target.value });
+	handleChartOneXAxis = (event) => {
+		this.setState({ chart1_x_axis: event.target.value });
 		//	console.log(
 		//		"Changed xscale from ",
 		//		this.state.selected_x_1,
@@ -58,10 +58,9 @@ class App extends Component {
 		//	);
 	};
 
-	handleColorChangeOne = (event) => {
-		this.setState({ selected_color_1: event.target.value });
+	handleChartOneColor = (event) => {
+		this.setState({ chart1_color_select: event.target.value });
 	};
-	handleDropdownChangeTwo = (event) => {};
 
 	render() {
 		return (
@@ -71,25 +70,25 @@ class App extends Component {
 					<Dropdown
 						options={this.state.quantitative_col}
 						selectedValue={this.state.selected_x_1}
-						onChange={this.handleDropdownChangeOne}
+						onChange={this.handleChartOneXAxis}
 						label="X Scale"
 					/>
 
 					<Dropdown
 						options={this.state.binary_col}
-						selectedValue={this.state.selected_color_1}
-						onChange={this.handleColorChangeOne}
+						selectedValue={this.state.chart1_color_select}
+						onChange={this.handleChartOneColor}
 						label="Color"
 					/>
 				</div>
 				<ScatterPlotComponent
 					csv_data={this.state.data}
-					x_scale={this.state.selected_x_1}
-					color={this.state.selected_color_1}
+					x_scale={this.state.chart1_x_axis}
+					color={this.state.chart1_color_select}
 				/>
 				<StackedBarComponent
 					csv_data={this.state.data}
-					x_scale={this.state.selected_x_2}
+					x_scale={this.state.chart1_x_axis}
 				/>
 			</div>
 		);

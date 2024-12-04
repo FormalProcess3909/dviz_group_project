@@ -21,7 +21,7 @@ class ScatterPlotComponent extends Component {
 	}
 
 	renderChart() {
-		const margin = { top: 50, right: 20, left: 20, bottom: 50 };
+		const margin = { top: 50, right: 20, left: 50, bottom: 50 };
 		const width = 1200 - margin.left - margin.right;
 		const height = 500 - margin.top - margin.bottom;
 
