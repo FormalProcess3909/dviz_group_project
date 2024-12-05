@@ -17,6 +17,13 @@ class ScatterPlotComponent extends Component {
 		return { min: min - margin, max: max + margin };
 	};
 
+	handleColor = (data, scale) => {
+		if (scale === "Parental_Education_Level") {
+		} else if (scale === "Distance_from_Home") {
+		} else {
+		}
+	};
+
 	componentDidMount() {
 		this.renderChart();
 	}
@@ -64,7 +71,10 @@ class ScatterPlotComponent extends Component {
 
 		svg.append("g").call(d3.axisLeft(yScale));
 
-		//var color = d3.scaleOrdinal();
+		var colorScale = d3
+			.scaleOrdinal()
+			.domain([0, 1, 2])
+			.range(["#F8766D", "#00BA38", "#619CFF"]);
 
 		svg.append("g")
 			.selectAll("dot")
@@ -76,7 +86,7 @@ class ScatterPlotComponent extends Component {
 						.attr("cx", (d) => xScale(d[x_axis]))
 						.attr("cy", (d) => yScale(d[y_axis]))
 						.attr("r", 5)
-						.attr("fill", (d) => d3.color(d[color])),
+						.attr("fill", (d) => colorScale(d[color])),
 				(update) => update,
 				(exit) => exit.remove()
 			);
