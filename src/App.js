@@ -90,21 +90,6 @@ class App extends Component {
 							onChange={this.handleChartOneColor}
 							label="Color"
 						/>
-
-						<div className="double_slider">
-							<input
-								type="range"
-								min={this.state.chart1_min}
-								max={this.state.chart1_max}
-								className="from_slider"
-							/>
-							<input
-								type="range"
-								min={this.state.chart1_min}
-								max={this.state.chart1_max}
-								className="to_slider"
-							/>
-						</div>
 					</div>
 					<ScatterPlotComponent
 						csv_data={this.state.data}
