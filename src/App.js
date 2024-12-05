@@ -116,14 +116,14 @@ class App extends Component {
 				<div className="chart2">
 					<div className="select_container">
 						<Dropdown
-							options={this.state.categorical_col}
+							options={this.state.binary_col}
 							selectedValue={this.state.chart2_x_axis}
 							onChange={this.handleChartTwoXAxis}
 							label="X Scale"
 						/>
 
 						<Dropdown
-							options={this.state.binary_col}
+							options={this.state.categorical_col}
 							selectedValue={this.state.chart2_color}
 							onChange={this.handleChartTwoColor}
 							label="Color"
