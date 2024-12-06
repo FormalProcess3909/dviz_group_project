@@ -7,10 +7,6 @@ class ScatterPlot extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			x_axis_min: 0,
-			x_axis_max: 0,
-			y_axis_min: 0,
-			y_axis_max: 0,
 			selected_x: "Hours_Studied",
 			selected_y: "Exam_Score",
 			selected_color: "Gender",

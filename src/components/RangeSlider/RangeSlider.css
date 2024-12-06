@@ -1,8 +1,6 @@
 .range-slider-container {
-	display: grid;
-	grid-template-columns: auto 1fr auto;
 	align-items: center;
-	width: 205px;
+	width: 40%;
 }
 
 .slider-min-label,
@@ -13,6 +11,9 @@
 	white-space: nowrap;
 }
 
+.slider-track {
+	margin-left: 10%;
+}
 input[type="range"] {
 	-webkit-appearance: none;
 	appearance: none;
