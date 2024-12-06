@@ -24,13 +24,7 @@ class ScatterPlotComponent extends Component {
 	};
 
 	handleColor = (data, scale) => {
-		const uniqueValues = Array.from(new Set(data.map((d) => d[scale])));
-		const colorScale = d3
-			.scaleOrdinal()
-			.domain(uniqueValues)
-			.range(d3.schemeCategory10);
-
-		return colorScale;
+		return Array.from(new Set(data.map((d) => d[scale])));
 	};
 
 	componentDidMount() {
@@ -66,8 +60,13 @@ class ScatterPlotComponent extends Component {
 
 		const xBounds = this.calculateScaleBounds(data, xAxis);
 		const yBounds = this.calculateScaleBounds(data, yAxis);
-		d3.select(".chart").selectAll("*").remove();
+		const uniqueValues = this.handleColor(data, color);
+		const colorScale = d3
+			.scaleOrdinal()
+			.domain(uniqueValues)
+			.range(d3.schemeTableau10);
 
+		d3.select(".chart").selectAll("*").remove();
 		const xScale = d3
 			.scaleLinear()
 			.domain([xBounds.min, xBounds.max])
@@ -86,13 +85,13 @@ class ScatterPlotComponent extends Component {
 			.append("g")
 			.attr("transform", `translate(${margin.left},${margin.top})`);
 
+		const legend = svg.append("g").attr("transform", "translate(10,10)");
+
 		svg.append("g")
 			.attr("transform", `translate(0,${height})`)
 			.call(d3.axisBottom(xScale));
 
 		svg.append("g").call(d3.axisLeft(yScale));
-
-		var colorScale = this.handleColor(data, color);
 
 		svg.append("g")
 			.selectAll("dot")
@@ -114,6 +113,32 @@ class ScatterPlotComponent extends Component {
 						.attr("cy", (d) => yScale(d[yAxis]))
 						.attr("fill", (d) => colorScale(d[color])),
 				(exit) => exit.transition().duration(300).attr("r", 0).remove()
+			);
+
+		legend
+			.selectAll("rect")
+			.data(colorScale.domain())
+			.join((enter) =>
+				enter
+					.append("rect")
+					.attr("x", 0)
+					.attr("y", (d, i) => i * 20)
+					.attr("width", 18)
+					.attr("height", 18)
+					.attr("fill", (d) => colorScale(d))
+			);
+
+		legend
+			.selectAll("text")
+			.data(colorScale.domain())
+			.join((enter) =>
+				enter
+					.append("text")
+					.attr("x", 24)
+					.attr("y", (d, i) => i * 20 + 13)
+					.text((d) => d)
+					.style("font-size", "12px")
+					.style("alignment-baseline", "middle")
 			);
 	}
 
