@@ -1,13 +1,7 @@
 import FileUpload from "./FileUpload";
-import ScatterPlotComponent from "./ScatterPlotComponent";
-import StackedBarComponent from "./StackedBarComponent";
+import ScatterPlot from "./ScatterPlotComponent/ScatterPlot";
+import StackedBar from "./StackedBarComponent";
 import Dropdown from "./Dropdown/Dropdown";
 import RangeSlider from "./RangeSlider/RangeSlider";
 
-export {
-	RangeSlider,
-	Dropdown,
-	FileUpload,
-	ScatterPlotComponent,
-	StackedBarComponent,
-};
+export { RangeSlider, Dropdown, FileUpload, ScatterPlot, StackedBar };

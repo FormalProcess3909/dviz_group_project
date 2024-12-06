@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./RangeSlider.css";
 
-const RangeSlider = ({ onChange, min = 0, max = 100 }) => {
+const RangeSlider = ({ onChange, min, max }) => {
 	const [fromValue, setFromValue] = useState(min);
 	const [toValue, setToValue] = useState(max);
 
@@ -24,7 +24,7 @@ const RangeSlider = ({ onChange, min = 0, max = 100 }) => {
         ${sliderBackground} 100%)`;
 
 		const sliders = document.querySelectorAll(
-			".double-slider input[type='range']"
+			".range-slider-container input[type='range']"
 		);
 		sliders.forEach((slider) => {
 			slider.style.background = sliderStyle;
@@ -52,23 +52,27 @@ const RangeSlider = ({ onChange, min = 0, max = 100 }) => {
 	}, [fromValue, toValue, min, max]);
 
 	return (
-		<div className="double-slider">
-			<input
-				type="range"
-				min={min}
-				max={max}
-				value={fromValue}
-				className="fromSlider"
-				onInput={handleFromChange}
-			/>
-			<input
-				type="range"
-				min={min}
-				max={max}
-				value={toValue}
-				className="toSlider"
-				onInput={handleToChange}
-			/>
+		<div className="range-slider-container">
+			<span className="slider-min-label">{fromValue}</span>
+			<div className="slider-track">
+				<input
+					type="range"
+					min={min}
+					max={max}
+					value={fromValue}
+					className="fromSlider"
+					onInput={handleFromChange}
+				/>
+				<input
+					type="range"
+					min={min}
+					max={max}
+					value={toValue}
+					className="toSlider"
+					onInput={handleToChange}
+				/>
+			</div>
+			<span className="slider-max-label">{toValue}</span>
 		</div>
 	);
 };

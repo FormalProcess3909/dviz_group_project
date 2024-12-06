@@ -1,11 +1,7 @@
 import React, { Component } from "react";
 
 import "./App.css";
-import {
-	FileUpload,
-	StackedBarComponent,
-	ScatterPlotComponent,
-} from "./components";
+import { FileUpload, StackedBar, ScatterPlot } from "./components";
 
 class App extends Component {
 	constructor(props) {
@@ -62,19 +58,21 @@ class App extends Component {
 		return (
 			<div className="container">
 				<FileUpload set_data={this.setData} />
-				<div className="chart1">
-					<ScatterPlotComponent
-						csv_data={this.state.data}
-						x_axis={this.state.quant_cols}
-						color={this.state.binary_cols}
-					/>
-				</div>
-				<div className="chart2">
-					<StackedBarComponent
-						csv_data={this.state.data}
-						x_scale={this.state.chart1_x_axis}
-						color={this.state.chart2_color}
-					/>
+				<div className="chart-container">
+					<div className="chart1">
+						<ScatterPlot
+							csv_data={this.state.data}
+							x_axis={this.state.quant_cols}
+							color={this.state.binary_cols}
+						/>
+					</div>
+					<div className="chart2">
+						<StackedBar
+							csv_data={this.state.data}
+							x_axis={this.state.chart1_x_axis}
+							color={this.state.chart2_color}
+						/>
+					</div>
 				</div>
 			</div>
 		);

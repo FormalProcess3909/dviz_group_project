@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import * as d3 from "d3";
-import { Dropdown, RangeSlider } from "./index";
+import { Dropdown, RangeSlider } from "../index";
+import "./ScatterPlot.css";
 
-class ScatterPlotComponent extends Component {
+class ScatterPlot extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -18,6 +19,14 @@ class ScatterPlotComponent extends Component {
 		};
 	}
 
+	componentDidMount() {
+		this.renderChart();
+	}
+
+	componentDidUpdate() {
+		this.renderChart();
+	}
+
 	calculateScaleBounds = (data, scale, margin = 10) => {
 		const [min, max] = d3.extent(data, (d) => +d[scale]);
 		return { min: min - margin, max: max + margin };
@@ -26,14 +35,6 @@ class ScatterPlotComponent extends Component {
 	handleColor = (data, scale) => {
 		return Array.from(new Set(data.map((d) => d[scale])));
 	};
-
-	componentDidMount() {
-		this.renderChart();
-	}
-
-	componentDidUpdate() {
-		this.renderChart();
-	}
 
 	handleXAxisSelect = (event) => {
 		this.setState({ selected_x: event.target.value });
@@ -45,7 +46,7 @@ class ScatterPlotComponent extends Component {
 
 	handleSliderChange = (from_value, to_value) => {
 		this.setState({ from_value, to_value });
-		console.log("From Value:", from_value, "To Value:", to_value);
+		//console.log("From Value:", from_value, "To Value:", to_value);
 	};
 
 	renderChart() {
@@ -65,6 +66,13 @@ class ScatterPlotComponent extends Component {
 			.scaleOrdinal()
 			.domain(uniqueValues)
 			.range(d3.schemeTableau10);
+
+		let colorFilter = new Set(uniqueValues);
+		let sliderFilter = data.filter(
+			(d) =>
+				+d[yAxis] >= this.state.from_value &&
+				+d[yAxis] <= this.state.to_value
+		);
 
 		d3.select(".chart").selectAll("*").remove();
 		const xScale = d3
@@ -94,8 +102,8 @@ class ScatterPlotComponent extends Component {
 		svg.append("g").call(d3.axisLeft(yScale));
 
 		svg.append("g")
-			.selectAll("dot")
-			.data(data)
+			.selectAll("circle")
+			.data(sliderFilter)
 			.join(
 				(enter) =>
 					enter
@@ -104,7 +112,7 @@ class ScatterPlotComponent extends Component {
 						.attr("cy", (d) => yScale(d[yAxis]))
 						.attr("r", 5)
 						.attr("fill", (d) => colorScale(d[color]))
-						.attr("opacity", 0.8),
+						.attr("opacity", 0.6),
 				(update) =>
 					update
 						.transition()
@@ -126,7 +134,21 @@ class ScatterPlotComponent extends Component {
 					.attr("width", 18)
 					.attr("height", 18)
 					.attr("fill", (d) => colorScale(d))
-			);
+			)
+			.on("click", (event, d) => {
+				if (colorFilter.has(d)) {
+					colorFilter.delete(d);
+				} else {
+					colorFilter.add(d);
+				}
+
+				svg.selectAll("circle")
+					.transition()
+					.duration(300)
+					.attr("opacity", (dataPoint) =>
+						colorFilter.has(dataPoint[color]) ? 0.6 : 0.0
+					);
+			});
 
 		legend
 			.selectAll("text")
@@ -139,10 +161,28 @@ class ScatterPlotComponent extends Component {
 					.text((d) => d)
 					.style("font-size", "12px")
 					.style("alignment-baseline", "middle")
-			);
+			)
+			.on("click", (event, d) => {
+				if (colorFilter.has(d)) {
+					colorFilter.delete(d);
+				} else {
+					colorFilter.add(d);
+				}
+
+				svg.selectAll("circle")
+					.transition()
+					.duration(300)
+					.attr("opacity", (dataPoint) =>
+						colorFilter.has(dataPoint[color]) ? 0.6 : 0.0
+					);
+			});
 	}
 
 	render() {
+		const yBound = this.calculateScaleBounds(
+			this.props.csv_data,
+			this.state.selected_y
+		);
 		return (
 			<div className="parent">
 				<fieldset className="select_container">
@@ -160,7 +200,11 @@ class ScatterPlotComponent extends Component {
 						label="Color"
 					/>
 
-					<RangeSlider onChange={this.handleSliderChange} />
+					<RangeSlider
+						onChange={this.handleSliderChange}
+						min={isNaN(yBound.min) ? 0 : yBound.min}
+						max={isNaN(yBound.max) ? 100 : yBound.max}
+					/>
 				</fieldset>
 				<div className="chart" />
 			</div>
@@ -168,4 +212,4 @@ class ScatterPlotComponent extends Component {
 	}
 }
 
-export default ScatterPlotComponent;
+export default ScatterPlot;

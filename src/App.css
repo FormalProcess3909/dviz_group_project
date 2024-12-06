@@ -2,23 +2,7 @@
 	width: 100%;
 }
 
-.select_container {
+.chart-container {
 	display: flex;
-	justify-content: space-evenly;
-	align-items: center;
-	gap: 10px;
-	margin: 10px;
+	justify-content: flex-start;
 }
-
-.select_container label {
-	margin-right: 10px;
-	font-weight: bold;
-}
-
-.select_container select {
-	font-size: 16px;
-	padding: 5px;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-}
-
