@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import * as d3 from "d3";
+import { Dropdown, RangeSlider } from "./index";
 
 class ScatterPlotComponent extends Component {
 	constructor(props) {
@@ -9,6 +10,11 @@ class ScatterPlotComponent extends Component {
 			x_axis_max: 0,
 			y_axis_min: 0,
 			y_axis_max: 0,
+			selected_x: "Hours_Studied",
+			selected_y: "Exam_Score",
+			selected_color: "Gender",
+			from_value: 0,
+			to_value: 100,
 		};
 	}
 
@@ -18,10 +24,13 @@ class ScatterPlotComponent extends Component {
 	};
 
 	handleColor = (data, scale) => {
-		if (scale === "Parental_Education_Level") {
-		} else if (scale === "Distance_from_Home") {
-		} else {
-		}
+		const uniqueValues = Array.from(new Set(data.map((d) => d[scale])));
+		const colorScale = d3
+			.scaleOrdinal()
+			.domain(uniqueValues)
+			.range(d3.schemeCategory10);
+
+		return colorScale;
 	};
 
 	componentDidMount() {
@@ -32,29 +41,41 @@ class ScatterPlotComponent extends Component {
 		this.renderChart();
 	}
 
+	handleXAxisSelect = (event) => {
+		this.setState({ selected_x: event.target.value });
+	};
+
+	handleColorSelect = (event) => {
+		this.setState({ selected_color: event.target.value });
+	};
+
+	handleSliderChange = (from_value, to_value) => {
+		this.setState({ from_value, to_value });
+		console.log("From Value:", from_value, "To Value:", to_value);
+	};
+
 	renderChart() {
 		const margin = { top: 50, right: 20, left: 50, bottom: 50 };
 		const width = 1200 - margin.left - margin.right;
 		const height = 500 - margin.top - margin.bottom;
 
 		const data = this.props.csv_data;
-		const x_axis = this.props.x_scale;
-		const y_axis = this.props.y_scale;
-		const color = this.props.color;
+		const xAxis = this.state.selected_x;
+		const yAxis = this.state.selected_y;
+		const color = this.state.selected_color;
 
-		const x_bounds = this.calculateScaleBounds(data, x_axis);
-		const y_bounds = this.calculateScaleBounds(data, y_axis);
-
+		const xBounds = this.calculateScaleBounds(data, xAxis);
+		const yBounds = this.calculateScaleBounds(data, yAxis);
 		d3.select(".chart").selectAll("*").remove();
 
 		const xScale = d3
 			.scaleLinear()
-			.domain([x_bounds.min, x_bounds.max])
+			.domain([xBounds.min, xBounds.max])
 			.range([0, width]);
 
 		const yScale = d3
 			.scaleLinear()
-			.domain([y_bounds.min, y_bounds.max])
+			.domain([yBounds.min, yBounds.max])
 			.range([height, 0]);
 
 		const svg = d3
@@ -71,10 +92,7 @@ class ScatterPlotComponent extends Component {
 
 		svg.append("g").call(d3.axisLeft(yScale));
 
-		var colorScale = d3
-			.scaleOrdinal()
-			.domain([0, 1, 2])
-			.range(["#F8766D", "#00BA38", "#619CFF"]);
+		var colorScale = this.handleColor(data, color);
 
 		svg.append("g")
 			.selectAll("dot")
@@ -83,17 +101,42 @@ class ScatterPlotComponent extends Component {
 				(enter) =>
 					enter
 						.append("circle")
-						.attr("cx", (d) => xScale(d[x_axis]))
-						.attr("cy", (d) => yScale(d[y_axis]))
+						.attr("cx", (d) => xScale(d[xAxis]))
+						.attr("cy", (d) => yScale(d[yAxis]))
 						.attr("r", 5)
+						.attr("fill", (d) => colorScale(d[color]))
+						.attr("opacity", 0.8),
+				(update) =>
+					update
+						.transition()
+						.duration(500)
+						.attr("cx", (d) => xScale(d[xAxis]))
+						.attr("cy", (d) => yScale(d[yAxis]))
 						.attr("fill", (d) => colorScale(d[color])),
-				(update) => update,
-				(exit) => exit.remove()
+				(exit) => exit.transition().duration(300).attr("r", 0).remove()
 			);
 	}
+
 	render() {
 		return (
 			<div className="parent">
+				<fieldset className="select_container">
+					<Dropdown
+						options={this.props.x_axis}
+						selectedValue={this.state.selected_x}
+						onChange={this.handleXAxisSelect}
+						label="X Scale"
+					/>
+
+					<Dropdown
+						options={this.props.color}
+						selectedValue={this.state.selected_color}
+						onChange={this.handleColorSelect}
+						label="Color"
+					/>
+
+					<RangeSlider onChange={this.handleSliderChange} />
+				</fieldset>
 				<div className="chart" />
 			</div>
 		);
