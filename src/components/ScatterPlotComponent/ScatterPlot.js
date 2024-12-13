@@ -127,9 +127,10 @@ class ScatterPlot extends Component {
 					.attr("fill", (d) => colorScale(d))
 			)
 			.on("click", (event, d) => {
-				if (colorFilter.has(d)) {
-					colorFilter.delete(d);
+				if (colorFilter.size === 1 && colorFilter.has(d)) {
+					colorFilter = new Set(uniqueValues);
 				} else {
+					colorFilter.clear();
 					colorFilter.add(d);
 				}
 
@@ -137,7 +138,7 @@ class ScatterPlot extends Component {
 					.transition()
 					.duration(300)
 					.attr("opacity", (dataPoint) =>
-						colorFilter.has(dataPoint[color]) ? 0.2 : 1
+						colorFilter.has(dataPoint[color]) ? 1 : 0.1
 					);
 			});
 
@@ -154,9 +155,10 @@ class ScatterPlot extends Component {
 					.style("alignment-baseline", "middle")
 			)
 			.on("click", (event, d) => {
-				if (colorFilter.has(d)) {
-					colorFilter.delete(d);
+				if (colorFilter.size === 1 && colorFilter.has(d)) {
+					colorFilter = new Set(uniqueValues);
 				} else {
+					colorFilter.clear();
 					colorFilter.add(d);
 				}
 
@@ -164,7 +166,7 @@ class ScatterPlot extends Component {
 					.transition()
 					.duration(300)
 					.attr("opacity", (dataPoint) =>
-						colorFilter.has(dataPoint[color]) ? 0.2 : 1
+						colorFilter.has(dataPoint[color]) ? 1 : 0.1
 					);
 			});
 	}

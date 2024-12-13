@@ -132,16 +132,18 @@ class StackedBar extends Component {
 					.attr("fill", (d) => colorScale(d))
 			)
 			.on("click", (event, d) => {
-				if (colorFilter.has(d)) {
-					colorFilter.delete(d);
+				if (colorFilter.size === 1 && colorFilter.has(d)) {
+					// If clicked item is the only one selected, reset all
+					colorFilter = new Set(colorValues);
 				} else {
+					// Otherwise clear all and select only this one
+					colorFilter.clear();
 					colorFilter.add(d);
 				}
-
 				bars.transition()
 					.duration(500)
 					.attr("opacity", (series) =>
-						colorFilter.has(series.key) ? 0.2 : 1
+						colorFilter.has(series.key) ? 1 : 0.2
 					);
 			});
 
@@ -158,16 +160,16 @@ class StackedBar extends Component {
 					.style("alignment-baseline", "middle")
 			)
 			.on("click", (event, d) => {
-				if (colorFilter.has(d)) {
-					colorFilter.delete(d);
+				if (colorFilter.size === 1 && colorFilter.has(d)) {
+					colorFilter = new Set(colorValues);
 				} else {
+					colorFilter.clear();
 					colorFilter.add(d);
 				}
-
 				bars.transition()
 					.duration(500)
 					.attr("opacity", (series) =>
-						colorFilter.has(series.key) ? 0.2 : 1
+						colorFilter.has(series.key) ? 1 : 0.2
 					);
 			});
 	}
