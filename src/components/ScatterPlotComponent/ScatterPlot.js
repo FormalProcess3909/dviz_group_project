@@ -48,8 +48,8 @@ class ScatterPlot extends Component {
 		const yAxis = this.state.selected_y;
 		const color = this.state.selected_color;
 
-		const xBounds = utils.calculateScaleBounds(data, xAxis);
-		const yBounds = utils.calculateScaleBounds(data, yAxis);
+		const xBounds = utils.calculateScaleBounds(data, xAxis, 3);
+		const yBounds = utils.calculateScaleBounds(data, yAxis, 3);
 		const uniqueValues = utils.handleColor(data, color);
 		const colorScale = d3
 			.scaleOrdinal()
@@ -63,16 +63,6 @@ class ScatterPlot extends Component {
 				+d[yAxis] <= this.state.to_value
 		);
 
-		const xScale = d3
-			.scaleLinear()
-			.domain([xBounds.min, xBounds.max])
-			.range([0, width]);
-
-		const yScale = d3
-			.scaleLinear()
-			.domain([yBounds.min, yBounds.max])
-			.range([height, 0]);
-
 		const svg = d3
 			.select(".scatter-plot")
 			.append("svg")
@@ -80,11 +70,6 @@ class ScatterPlot extends Component {
 			.attr("height", height + margin.top + margin.bottom)
 			.append("g")
 			.attr("transform", `translate(${margin.left},${margin.top})`);
-
-		const legend = svg
-			.append("g")
-			.attr("transform", "translate(10,10)")
-			.data(colorScale.domain());
 
 		const tooltip = d3
 			.select("body")
@@ -96,81 +81,104 @@ class ScatterPlot extends Component {
 		};
 
 		const mouseMove = function (event, d) {
+			const circle = d3.select(this);
+			const radius = parseFloat(circle.attr("r"));
 			tooltip
 				.html(
-					`${xAxis}: ${d[xAxis]}<br>` +
-						`${yAxis}: ${d[yAxis]}<br>` +
-						`${color}: ${d[color]}<br>`
+					`${xAxis.replace(/_/g, " ")}: ${d[xAxis]}<br>` +
+						`${yAxis.replace(/_/g, " ")}: ${d[yAxis]}<br>` +
+						`${color.replace(/_/g, " ")}: ${d[color]}<br>`
 				)
-				.style("left", event.pageX + 90 + "px")
-				.style("top", event.pageY + "px");
+				.style("left", event.pageX + radius + "px")
+				.style("top", event.pageY - radius + "px");
 		};
 
 		const mouseLeave = function (event, d) {
 			tooltip.style("opacity", 0);
 		};
 
+		const legend = svg
+			.append("g")
+			.attr("transform", "translate(10,10)")
+			.data(colorScale.domain());
+
+		const legendItems = legend
+			.selectAll("g")
+			.data(colorScale.domain())
+			.join("g")
+			.attr("transform", (d, i) => `translate(0,${i * 20})`)
+			.style("cursor", "pointer")
+			.on("click", (event, d) => {
+				if (colorFilter.size === 1 && colorFilter.has(d)) {
+					colorFilter = new Set(uniqueValues);
+				} else {
+					colorFilter.clear();
+					colorFilter.add(d);
+				}
+				svg.selectAll("circle")
+					.transition()
+					.duration(300)
+					.attr("opacity", (dataPoint) =>
+						colorFilter.has(dataPoint[color]) ? 1 : 0
+					);
+			});
+
+		legendItems
+			.append("rect")
+			.attr("width", 18)
+			.attr("height", 18)
+			.attr("fill", (d) => colorScale(d));
+
+		legendItems
+			.append("text")
+			.attr("x", 24)
+			.attr("y", 13)
+			.text((d) => d)
+			.style("font-size", "12px")
+			.style("alignment-baseline", "middle");
+
+		const xScale = d3
+			.scaleLinear()
+			.domain([xBounds.min, xBounds.max])
+			.range([0, width]);
+
+		const yScale = d3
+			.scaleLinear()
+			.domain([yBounds.min, yBounds.max])
+			.range([height, 0]);
+
+		const binWidth = 10;
+		let densityMap = new Map();
+
+		sliderFilter.forEach((d) => {
+			const binKey = `${Math.floor(
+				xScale(d[xAxis]) / binWidth
+			)},${Math.floor(yScale(d[yAxis]) / binWidth)}`;
+			densityMap.set(binKey, (densityMap.get(binKey) || 0) + 1);
+		});
+
+		const maxDensity = Math.max(...densityMap.values());
+
 		svg.append("g")
 			.attr("transform", `translate(0,${height})`)
-			.call(d3.axisBottom(xScale));
+			.call(d3.axisBottom(xScale))
+			.append("text")
+			.attr("text-anchor", "middle")
+			.attr("x", width / 2)
+			.attr("y", margin.bottom - 10)
+			.attr("fill", "black")
+			.text(xAxis.replace(/_/g, " "));
 
-		svg.append("g").call(d3.axisLeft(yScale));
-
-		legend
-			.selectAll("rect")
-			.data(colorScale.domain())
-			.join((enter) =>
-				enter
-					.append("rect")
-					.attr("x", 0)
-					.attr("y", (d, i) => i * 20)
-					.attr("width", 18)
-					.attr("height", 18)
-					.attr("fill", (d) => colorScale(d))
+		svg.append("g")
+			.call(d3.axisLeft(yScale))
+			.append("text")
+			.attr("text-anchor", "middle")
+			.attr(
+				"transform",
+				`translate(${-margin.left + 20},${height / 2}) rotate(-90)`
 			)
-			.on("click", (event, d) => {
-				if (colorFilter.size === 1 && colorFilter.has(d)) {
-					colorFilter = new Set(uniqueValues);
-				} else {
-					colorFilter.clear();
-					colorFilter.add(d);
-				}
-
-				svg.selectAll("circle")
-					.transition()
-					.duration(300)
-					.attr("opacity", (dataPoint) =>
-						colorFilter.has(dataPoint[color]) ? 1 : 0.1
-					);
-			});
-
-		legend
-			.selectAll("text")
-			.data(colorScale.domain())
-			.join((enter) =>
-				enter
-					.append("text")
-					.attr("x", 24)
-					.attr("y", (d, i) => i * 20 + 13)
-					.text((d) => d)
-					.style("font-size", "12px")
-					.style("alignment-baseline", "middle")
-			)
-			.on("click", (event, d) => {
-				if (colorFilter.size === 1 && colorFilter.has(d)) {
-					colorFilter = new Set(uniqueValues);
-				} else {
-					colorFilter.clear();
-					colorFilter.add(d);
-				}
-
-				svg.selectAll("circle")
-					.transition()
-					.duration(300)
-					.attr("opacity", (dataPoint) =>
-						colorFilter.has(dataPoint[color]) ? 1 : 0.1
-					);
-			});
+			.attr("fill", "black")
+			.text(yAxis.replace(/_/g, " "));
 
 		svg.append("g")
 			.selectAll("circle")
@@ -181,9 +189,15 @@ class ScatterPlot extends Component {
 						.append("circle")
 						.attr("cx", (d) => xScale(d[xAxis]))
 						.attr("cy", (d) => yScale(d[yAxis]))
-						.attr("r", 5)
+						.attr("r", (d) => {
+							const binKey = `${Math.floor(
+								xScale(d[xAxis]) / binWidth
+							)},${Math.floor(yScale(d[yAxis]) / binWidth)}`;
+							const density = densityMap.get(binKey);
+							return 3 + Math.sqrt(density / maxDensity) * 5;
+						})
 						.attr("fill", (d) => colorScale(d[color]))
-						.attr("opacity", 0.6),
+						.attr("opacity", 1),
 				(update) =>
 					update
 						.transition()

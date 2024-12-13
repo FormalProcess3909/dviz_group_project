@@ -30,7 +30,8 @@
 	position: absolute;
 	background-color: white;
 	border: "solid";
-	border-width: 1px;
+	border-color: black;
+	border-width: 5px;
 	border-radius: 5px;
 	padding: 10px;
 	opacity: 0;

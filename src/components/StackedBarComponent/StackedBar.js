@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Dropdown } from "../index";
 import * as d3 from "d3";
-
+import utils from "../../utils";
 class StackedBar extends Component {
 	constructor(props) {
 		super(props);
@@ -91,60 +91,133 @@ class StackedBar extends Component {
 			.attr("class", "series")
 			.attr("fill", (d) => colorScale(d.key));
 
+		const tooltip = d3
+			.select("body")
+			.append("div")
+			.attr("class", "tooltip");
+
+		const mouseOver = function (event, d) {
+			tooltip.style("opacity", 1);
+		};
+
+		const mouseMove = function (event, d) {
+			tooltip.selectAll("*").remove();
+			const key = Object.keys(d.data).find(
+				(k) => d.data[k] === d[1] - d[0] && k !== xAxis
+			);
+			const groupStudents = data.filter(
+				(student) =>
+					student[color] === key && student[xAxis] === d.data[xAxis]
+			);
+			const examScores = groupStudents.map(
+				(student) => +student["Exam_Score"]
+			);
+
+			const xMiniBounds = utils.calculateScaleBounds(
+				groupStudents,
+				"Exam_Score",
+				5
+			);
+
+			const bins = d3
+				.bin()
+				.domain([xMiniBounds.min, xMiniBounds.max])
+				.thresholds(d3.range(0, 100, 5))(examScores);
+
+			const miniMargin = { top: 20, right: 20, bottom: 30, left: 50 };
+			const tooltipWidth = 300;
+			const tooltipHeight = 200;
+
+			const tooltipSvg = tooltip
+				.style("opacity", 1)
+				.style("left", event.pageX + 10 + "px")
+				.style("top", event.pageY - 200 + "px")
+				.append("svg")
+				.attr("width", tooltipWidth)
+				.attr("height", tooltipHeight)
+				.append("g")
+				.attr(
+					"transform",
+					`translate(${miniMargin.left},${miniMargin.top})`
+				);
+
+			const miniX = d3
+				.scaleLinear()
+				.domain([xMiniBounds.min, xMiniBounds.max])
+				.range([0, tooltipWidth - miniMargin.left - miniMargin.right])
+				.nice();
+
+			const miniY = d3
+				.scaleLinear()
+				.domain([0, d3.max(bins, (d) => d.length)])
+				.range([tooltipHeight - miniMargin.top - miniMargin.bottom, 0])
+				.nice();
+
+			tooltipSvg
+				.selectAll("rect")
+				.data(bins)
+				.join("rect")
+				.attr("x", (d) => miniX(d.x0))
+				.attr("y", (d) => miniY(d.length))
+				.attr("width", (d) =>
+					Math.max(0, miniX(d.x1) - miniX(d.x0) - 1)
+				)
+				.attr(
+					"height",
+					(d) =>
+						tooltipHeight -
+						miniMargin.top -
+						miniMargin.bottom -
+						miniY(d.length)
+				)
+				.attr("fill", colorScale(key));
+
+			const miniXAxis = d3.axisBottom(miniX).ticks(10);
+
+			const miniYAxis = d3.axisLeft(miniY).ticks(5);
+
+			tooltipSvg
+				.append("g")
+				.attr(
+					"transform",
+					`translate(0,${
+						tooltipHeight - miniMargin.top - miniMargin.bottom
+					})`
+				)
+				.call(miniXAxis)
+				.append("text")
+				.attr(
+					"x",
+					tooltipWidth - miniMargin.left - miniMargin.right - 10
+				)
+				.attr("y", 25)
+				.attr("fill", "black")
+				.style("text-anchor", "end")
+				.text("Exam Score");
+
+			tooltipSvg
+				.append("g")
+				.call(miniYAxis)
+				.append("text")
+				.attr("transform", "rotate(-90)")
+				.attr("x", -10)
+				.attr("y", -30)
+				.attr("fill", "black")
+				.style("text-anchor", "end")
+				.text("Number of Students");
+		};
+		const mouseLeave = function (event, d) {
+			tooltip.style("opacity", 0);
+		};
+
 		const legend = svg.append("g").attr("transform", "translate(10,10)");
 
-		const tooltip = d3
-			.select(".stacked-bar")
-			.append("div")
-			.style("opacity", 0)
-			.attr("class", "tooltip")
-			.style("background-color", "white")
-			.style("border", "solid")
-			.style("border-width", "1px")
-			.style("border-radius", "5px")
-			.style("padding", "10px");
-
-		legend
-			.selectAll("rect")
+		const legendItems = legend
+			.selectAll("g")
 			.data(colorScale.domain())
-			.join((enter) =>
-				enter
-					.append("rect")
-					.attr("x", 0)
-					.attr("y", (d, i) => i * 20)
-					.attr("width", 18)
-					.attr("height", 18)
-					.attr("fill", (d) => colorScale(d))
-			)
-			.on("click", (event, d) => {
-				if (colorFilter.size === 1 && colorFilter.has(d)) {
-					// If clicked item is the only one selected, reset all
-					colorFilter = new Set(colorValues);
-				} else {
-					// Otherwise clear all and select only this one
-					colorFilter.clear();
-					colorFilter.add(d);
-				}
-				bars.transition()
-					.duration(500)
-					.attr("opacity", (series) =>
-						// Opacity here
-						colorFilter.has(series.key) ? 1 : 0.2
-					);
-			});
-
-		legend
-			.selectAll("text")
-			.data(colorScale.domain())
-			.join((enter) =>
-				enter
-					.append("text")
-					.attr("x", 24)
-					.attr("y", (d, i) => i * 20 + 13)
-					.text((d) => d)
-					.style("font-size", "12px")
-					.style("alignment-baseline", "middle")
-			)
+			.join("g")
+			.attr("transform", (d, i) => `translate(0,${i * 20})`)
+			.style("cursor", "pointer")
 			.on("click", (event, d) => {
 				if (colorFilter.size === 1 && colorFilter.has(d)) {
 					colorFilter = new Set(colorValues);
@@ -158,6 +231,20 @@ class StackedBar extends Component {
 						colorFilter.has(series.key) ? 1 : 0.2
 					);
 			});
+
+		legendItems
+			.append("rect")
+			.attr("width", 18)
+			.attr("height", 18)
+			.attr("fill", (d) => colorScale(d));
+
+		legendItems
+			.append("text")
+			.attr("x", 24)
+			.attr("y", 13)
+			.text((d) => d)
+			.style("font-size", "12px")
+			.style("alignment-baseline", "middle");
 
 		bars.selectAll("rect")
 			.data((d) => d)
@@ -166,14 +253,23 @@ class StackedBar extends Component {
 			.attr("y", (d) => yScale(d[1]))
 			.attr("height", (d) => yScale(d[0]) - yScale(d[1]))
 			.attr("width", xScale.bandwidth())
-			.append("title")
-			.text((d) => `${d.data[xAxis]}\n${d.key}: ${d[1] - d[0]} students`);
+			.on("mouseover", mouseOver)
+			.on("mousemove", mouseMove)
+			.on("mouseleave", mouseLeave);
 
 		svg.append("g")
 			.attr("transform", `translate(0,${height})`)
 			.call(d3.axisBottom(xScale))
 			.selectAll("text")
 			.style("text-anchor", "middle");
+
+		svg.append("text")
+			.attr("x", width / 2)
+			.attr("y", height + 40)
+			.attr("text-anchor", "middle")
+			.attr("fill", "black")
+			.style("font-size", "14px")
+			.text(xAxis.replace(/_/g, " "));
 
 		svg.append("g")
 			.call(d3.axisLeft(yScale))

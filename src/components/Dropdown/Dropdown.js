@@ -9,7 +9,7 @@ const Dropdown = ({ options, selectedValue, onChange, label }) => {
 			<select value={selectedValue} onChange={onChange}>
 				{options.map((option) => (
 					<option key={option} value={option}>
-						{option}
+						{option.replace(/_/g, " ")}
 					</option>
 				))}
 			</select>
