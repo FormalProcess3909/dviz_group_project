@@ -187,10 +187,7 @@ class StackedBar extends Component {
 				)
 				.call(miniXAxis)
 				.append("text")
-				.attr(
-					"x",
-					tooltipWidth - miniMargin.left - miniMargin.right - 10
-				)
+				.attr("x", tooltipWidth / 2)
 				.attr("y", 25)
 				.attr("fill", "black")
 				.style("text-anchor", "end")
@@ -201,12 +198,13 @@ class StackedBar extends Component {
 				.call(miniYAxis)
 				.append("text")
 				.attr("transform", "rotate(-90)")
-				.attr("x", -10)
+				.attr("x", -30)
 				.attr("y", -30)
 				.attr("fill", "black")
 				.style("text-anchor", "end")
 				.text("Number of Students");
 		};
+
 		const mouseLeave = function (event, d) {
 			tooltip.style("opacity", 0);
 		};

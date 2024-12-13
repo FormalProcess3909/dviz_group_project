@@ -36,3 +36,7 @@
 	padding: 10px;
 	opacity: 0;
 }
+
+circle {
+	transition: opacity 0.2s ease;
+}

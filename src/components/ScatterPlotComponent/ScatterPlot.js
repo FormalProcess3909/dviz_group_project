@@ -57,12 +57,17 @@ class ScatterPlot extends Component {
 			.range(d3.schemeTableau10);
 
 		let colorFilter = new Set(uniqueValues);
-		let sliderFilter = data.filter(
-			(d) =>
-				+d[yAxis] >= this.state.from_value &&
-				+d[yAxis] <= this.state.to_value
-		);
+		const numericData = data.map((d) => ({
+			...d,
+			numericX: +d[xAxis],
+			numericY: +d[yAxis],
+		}));
 
+		let sliderFilter = numericData.filter(
+			(d) =>
+				d.numericY >= this.state.from_value &&
+				d.numericY <= this.state.to_value
+		);
 		const svg = d3
 			.select(".scatter-plot")
 			.append("svg")
@@ -183,30 +188,18 @@ class ScatterPlot extends Component {
 		svg.append("g")
 			.selectAll("circle")
 			.data(sliderFilter)
-			.join(
-				(enter) =>
-					enter
-						.append("circle")
-						.attr("cx", (d) => xScale(d[xAxis]))
-						.attr("cy", (d) => yScale(d[yAxis]))
-						.attr("r", (d) => {
-							const binKey = `${Math.floor(
-								xScale(d[xAxis]) / binWidth
-							)},${Math.floor(yScale(d[yAxis]) / binWidth)}`;
-							const density = densityMap.get(binKey);
-							return 3 + Math.sqrt(density / maxDensity) * 5;
-						})
-						.attr("fill", (d) => colorScale(d[color]))
-						.attr("opacity", 1),
-				(update) =>
-					update
-						.transition()
-						.duration(500)
-						.attr("cx", (d) => xScale(d[xAxis]))
-						.attr("cy", (d) => yScale(d[yAxis]))
-						.attr("fill", (d) => colorScale(d[color])),
-				(exit) => exit.transition().duration(300).attr("r", 0).remove()
-			)
+			.join("circle")
+			.attr("cx", (d) => xScale(d.numericX))
+			.attr("cy", (d) => yScale(d.numericY))
+			.attr("r", (d) => {
+				const binKey = `${Math.floor(
+					xScale(d.numericX) / binWidth
+				)},${Math.floor(yScale(d.numericY) / binWidth)}`;
+				const density = densityMap.get(binKey);
+				return 3 + Math.sqrt(density / maxDensity) * 5;
+			})
+			.attr("fill", (d) => colorScale(d[color]))
+			.attr("opacity", 1)
 			.on("mouseover", mouseOver)
 			.on("mousemove", mouseMove)
 			.on("mouseleave", mouseLeave);
