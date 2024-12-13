@@ -91,33 +91,18 @@ class StackedBar extends Component {
 			.attr("class", "series")
 			.attr("fill", (d) => colorScale(d.key));
 
-		bars.selectAll("rect")
-			.data((d) => d)
-			.join("rect")
-			.attr("x", (d) => xScale(d.data[xAxis]))
-			.attr("y", (d) => yScale(d[1]))
-			.attr("height", (d) => yScale(d[0]) - yScale(d[1]))
-			.attr("width", xScale.bandwidth())
-			.append("title")
-			.text((d) => `${d.data[xAxis]}\n${d.key}: ${d[1] - d[0]} students`);
-
-		svg.append("g")
-			.attr("transform", `translate(0,${height})`)
-			.call(d3.axisBottom(xScale))
-			.selectAll("text")
-			.style("text-anchor", "middle");
-
-		svg.append("g")
-			.call(d3.axisLeft(yScale))
-			.append("text")
-			.attr("transform", "rotate(-90)")
-			.attr("y", -40)
-			.attr("x", -height / 2)
-			.attr("text-anchor", "middle")
-			.attr("fill", "black")
-			.text("Total Number of Students");
-
 		const legend = svg.append("g").attr("transform", "translate(10,10)");
+
+		const tooltip = d3
+			.select(".stacked-bar")
+			.append("div")
+			.style("opacity", 0)
+			.attr("class", "tooltip")
+			.style("background-color", "white")
+			.style("border", "solid")
+			.style("border-width", "1px")
+			.style("border-radius", "5px")
+			.style("padding", "10px");
 
 		legend
 			.selectAll("rect")
@@ -143,6 +128,7 @@ class StackedBar extends Component {
 				bars.transition()
 					.duration(500)
 					.attr("opacity", (series) =>
+						// Opacity here
 						colorFilter.has(series.key) ? 1 : 0.2
 					);
 			});
@@ -172,6 +158,32 @@ class StackedBar extends Component {
 						colorFilter.has(series.key) ? 1 : 0.2
 					);
 			});
+
+		bars.selectAll("rect")
+			.data((d) => d)
+			.join("rect")
+			.attr("x", (d) => xScale(d.data[xAxis]))
+			.attr("y", (d) => yScale(d[1]))
+			.attr("height", (d) => yScale(d[0]) - yScale(d[1]))
+			.attr("width", xScale.bandwidth())
+			.append("title")
+			.text((d) => `${d.data[xAxis]}\n${d.key}: ${d[1] - d[0]} students`);
+
+		svg.append("g")
+			.attr("transform", `translate(0,${height})`)
+			.call(d3.axisBottom(xScale))
+			.selectAll("text")
+			.style("text-anchor", "middle");
+
+		svg.append("g")
+			.call(d3.axisLeft(yScale))
+			.append("text")
+			.attr("transform", "rotate(-90)")
+			.attr("y", -40)
+			.attr("x", -height / 2)
+			.attr("text-anchor", "middle")
+			.attr("fill", "black")
+			.text("Total Number of Students");
 	}
 
 	render() {

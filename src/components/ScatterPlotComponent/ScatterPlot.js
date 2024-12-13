@@ -81,38 +81,40 @@ class ScatterPlot extends Component {
 			.append("g")
 			.attr("transform", `translate(${margin.left},${margin.top})`);
 
+		const legend = svg
+			.append("g")
+			.attr("transform", "translate(10,10)")
+			.data(colorScale.domain());
+
+		const tooltip = d3
+			.select("body")
+			.append("div")
+			.attr("class", "tooltip");
+
+		const mouseOver = function (event, d) {
+			tooltip.style("opacity", 1);
+		};
+
+		const mouseMove = function (event, d) {
+			tooltip
+				.html(
+					`${xAxis}: ${d[xAxis]}<br>` +
+						`${yAxis}: ${d[yAxis]}<br>` +
+						`${color}: ${d[color]}<br>`
+				)
+				.style("left", event.pageX + 90 + "px")
+				.style("top", event.pageY + "px");
+		};
+
+		const mouseLeave = function (event, d) {
+			tooltip.style("opacity", 0);
+		};
+
 		svg.append("g")
 			.attr("transform", `translate(0,${height})`)
 			.call(d3.axisBottom(xScale));
 
 		svg.append("g").call(d3.axisLeft(yScale));
-
-		svg.append("g")
-			.selectAll("circle")
-			.data(sliderFilter)
-			.join(
-				(enter) =>
-					enter
-						.append("circle")
-						.attr("cx", (d) => xScale(d[xAxis]))
-						.attr("cy", (d) => yScale(d[yAxis]))
-						.attr("r", 5)
-						.attr("fill", (d) => colorScale(d[color]))
-						.attr("opacity", 0.6),
-				(update) =>
-					update
-						.transition()
-						.duration(500)
-						.attr("cx", (d) => xScale(d[xAxis]))
-						.attr("cy", (d) => yScale(d[yAxis]))
-						.attr("fill", (d) => colorScale(d[color])),
-				(exit) => exit.transition().duration(300).attr("r", 0).remove()
-			);
-
-		const legend = svg
-			.append("g")
-			.attr("transform", "translate(10,10)")
-			.data(colorScale.domain());
 
 		legend
 			.selectAll("rect")
@@ -169,6 +171,31 @@ class ScatterPlot extends Component {
 						colorFilter.has(dataPoint[color]) ? 1 : 0.1
 					);
 			});
+
+		svg.append("g")
+			.selectAll("circle")
+			.data(sliderFilter)
+			.join(
+				(enter) =>
+					enter
+						.append("circle")
+						.attr("cx", (d) => xScale(d[xAxis]))
+						.attr("cy", (d) => yScale(d[yAxis]))
+						.attr("r", 5)
+						.attr("fill", (d) => colorScale(d[color]))
+						.attr("opacity", 0.6),
+				(update) =>
+					update
+						.transition()
+						.duration(500)
+						.attr("cx", (d) => xScale(d[xAxis]))
+						.attr("cy", (d) => yScale(d[yAxis]))
+						.attr("fill", (d) => colorScale(d[color])),
+				(exit) => exit.transition().duration(300).attr("r", 0).remove()
+			)
+			.on("mouseover", mouseOver)
+			.on("mousemove", mouseMove)
+			.on("mouseleave", mouseLeave);
 	}
 
 	render() {

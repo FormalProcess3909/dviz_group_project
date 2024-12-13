@@ -25,3 +25,13 @@
 	margin: 0 10px; /* Add spacing between the slider and labels */
 	white-space: nowrap;
 }
+
+.tooltip {
+	position: absolute;
+	background-color: white;
+	border: "solid";
+	border-width: 1px;
+	border-radius: 5px;
+	padding: 10px;
+	opacity: 0;
+}
