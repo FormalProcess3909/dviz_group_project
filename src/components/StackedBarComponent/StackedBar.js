@@ -138,11 +138,10 @@ class StackedBar extends Component {
 					colorFilter.add(d);
 				}
 
-				svg.selectAll("rect")
-					.transition()
+				bars.transition()
 					.duration(500)
-					.attr("opacity", (chartBar) =>
-						colorFilter.has(chartBar[color]) ? 1 : 0.2
+					.attr("opacity", (series) =>
+						colorFilter.has(series.key) ? 0.2 : 1
 					);
 			});
 
@@ -165,11 +164,10 @@ class StackedBar extends Component {
 					colorFilter.add(d);
 				}
 
-				svg.selectAll("rect")
-					.transition()
+				bars.transition()
 					.duration(500)
-					.attr("opacity", (chartBar) =>
-						colorFilter.has(chartBar[color]) ? 1 : 0.2
+					.attr("opacity", (series) =>
+						colorFilter.has(series.key) ? 0.2 : 1
 					);
 			});
 	}

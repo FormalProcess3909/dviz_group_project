@@ -137,7 +137,7 @@ class ScatterPlot extends Component {
 					.transition()
 					.duration(300)
 					.attr("opacity", (dataPoint) =>
-						colorFilter.has(dataPoint[color]) ? 0.6 : 0.0
+						colorFilter.has(dataPoint[color]) ? 0.2 : 1
 					);
 			});
 
@@ -164,7 +164,7 @@ class ScatterPlot extends Component {
 					.transition()
 					.duration(300)
 					.attr("opacity", (dataPoint) =>
-						colorFilter.has(dataPoint[color]) ? 0.6 : 0.0
+						colorFilter.has(dataPoint[color]) ? 0.2 : 1
 					);
 			});
 	}
