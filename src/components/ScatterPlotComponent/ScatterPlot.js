@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import * as d3 from "d3";
 import { Dropdown, RangeSlider } from "../index";
 import "./ScatterPlot.css";
+import utils from "../../utils";
 
 class ScatterPlot extends Component {
 	constructor(props) {
@@ -23,15 +24,6 @@ class ScatterPlot extends Component {
 		this.renderChart();
 	}
 
-	calculateScaleBounds = (data, scale, margin = 10) => {
-		const [min, max] = d3.extent(data, (d) => +d[scale]);
-		return { min: min - margin, max: max + margin };
-	};
-
-	handleColor = (data, scale) => {
-		return Array.from(new Set(data.map((d) => d[scale])));
-	};
-
 	handleXAxisSelect = (event) => {
 		this.setState({ selected_x: event.target.value });
 	};
@@ -42,10 +34,11 @@ class ScatterPlot extends Component {
 
 	handleSliderChange = (from_value, to_value) => {
 		this.setState({ from_value, to_value });
-		//console.log("From Value:", from_value, "To Value:", to_value);
 	};
 
 	renderChart() {
+		d3.select(".scatter-plot").selectAll("*").remove();
+
 		const margin = { top: 50, right: 20, left: 50, bottom: 50 };
 		const width = 1200 - margin.left - margin.right;
 		const height = 500 - margin.top - margin.bottom;
@@ -55,9 +48,9 @@ class ScatterPlot extends Component {
 		const yAxis = this.state.selected_y;
 		const color = this.state.selected_color;
 
-		const xBounds = this.calculateScaleBounds(data, xAxis);
-		const yBounds = this.calculateScaleBounds(data, yAxis);
-		const uniqueValues = this.handleColor(data, color);
+		const xBounds = utils.calculateScaleBounds(data, xAxis);
+		const yBounds = utils.calculateScaleBounds(data, yAxis);
+		const uniqueValues = utils.handleColor(data, color);
 		const colorScale = d3
 			.scaleOrdinal()
 			.domain(uniqueValues)
@@ -70,7 +63,6 @@ class ScatterPlot extends Component {
 				+d[yAxis] <= this.state.to_value
 		);
 
-		d3.select(".chart").selectAll("*").remove();
 		const xScale = d3
 			.scaleLinear()
 			.domain([xBounds.min, xBounds.max])
@@ -82,14 +74,12 @@ class ScatterPlot extends Component {
 			.range([height, 0]);
 
 		const svg = d3
-			.select(".chart")
+			.select(".scatter-plot")
 			.append("svg")
 			.attr("width", width + margin.left + margin.right)
 			.attr("height", height + margin.top + margin.bottom)
 			.append("g")
 			.attr("transform", `translate(${margin.left},${margin.top})`);
-
-		const legend = svg.append("g").attr("transform", "translate(10,10)");
 
 		svg.append("g")
 			.attr("transform", `translate(0,${height})`)
@@ -118,6 +108,11 @@ class ScatterPlot extends Component {
 						.attr("fill", (d) => colorScale(d[color])),
 				(exit) => exit.transition().duration(300).attr("r", 0).remove()
 			);
+
+		const legend = svg
+			.append("g")
+			.attr("transform", "translate(10,10)")
+			.data(colorScale.domain());
 
 		legend
 			.selectAll("rect")
@@ -175,7 +170,7 @@ class ScatterPlot extends Component {
 	}
 
 	render() {
-		const yBound = this.calculateScaleBounds(
+		const yBound = utils.calculateScaleBounds(
 			this.props.csv_data,
 			this.state.selected_y
 		);
@@ -202,7 +197,7 @@ class ScatterPlot extends Component {
 						max={isNaN(yBound.max) ? 100 : yBound.max}
 					/>
 				</fieldset>
-				<div className="chart" />
+				<div className="chart scatter-plot" />
 			</div>
 		);
 	}

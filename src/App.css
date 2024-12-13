@@ -4,5 +4,13 @@
 
 .chart-container {
 	display: flex;
-	justify-content: flex-start;
+	flex-direction: column;
+	gap: 20px;
+	margin-top: 20px;
+}
+
+.chart1,
+.chart2 {
+	width: 100%;
+	position: relative;
 }

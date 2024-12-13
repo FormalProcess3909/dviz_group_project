@@ -69,8 +69,8 @@ class App extends Component {
 					<div className="chart2">
 						<StackedBar
 							csv_data={this.state.data}
-							x_axis={this.state.chart1_x_axis}
-							color={this.state.chart2_color}
+							x_axis={this.state.binary_cols}
+							color={this.state.cat_cols}
 						/>
 					</div>
 				</div>
