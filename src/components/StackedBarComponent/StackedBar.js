@@ -39,7 +39,17 @@ class StackedBar extends Component {
 		const color = this.state.selected_color;
 
 		const xValues = [...new Set(data.map((d) => d[xAxis]))].sort();
-		const colorValues = [...new Set(data.map((d) => d[color]))].sort();
+		const colorValues = [
+			...new Set(
+				data.map((d) =>
+					d[color] === "" ||
+					d[color] === undefined ||
+					d[color] === null
+						? "Did Not Answer"
+						: d[color]
+				)
+			),
+		].sort();
 
 		let colorFilter = new Set(colorValues);
 
