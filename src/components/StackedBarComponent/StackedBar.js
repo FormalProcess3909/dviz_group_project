@@ -34,22 +34,13 @@ class StackedBar extends Component {
 		const width = 1200 - margin.left - margin.right;
 		const height = 500 - margin.top - margin.bottom;
 
-		const data = this.props.csv_data;
 		const xAxis = this.state.selected_x;
 		const color = this.state.selected_color;
-
+		const data = this.props.csv_data.filter(
+			(d) => d[color] !== "" && d[color] != null
+		);
 		const xValues = [...new Set(data.map((d) => d[xAxis]))].sort();
-		const colorValues = [
-			...new Set(
-				data.map((d) =>
-					d[color] === "" ||
-					d[color] === undefined ||
-					d[color] === null
-						? "Did Not Answer"
-						: d[color]
-				)
-			),
-		].sort();
+		const colorValues = [...new Set(data.map((d) => d[color]))].sort();
 
 		let colorFilter = new Set(colorValues);
 
